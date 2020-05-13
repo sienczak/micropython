@@ -222,7 +222,9 @@ mp_map_elem_t *mp_map_lookup(mp_map_t *map, mp_obj_t index, mp_map_lookup_kind_t
     if (mp_obj_is_qstr(index)) {
         hash = qstr_hash(MP_OBJ_QSTR_VALUE(index));
     } else {
+        WARNING_DISABLE(bad_function_cast) // Required by design
         hash = MP_OBJ_SMALL_INT_VALUE(mp_unary_op(MP_UNARY_OP_HASH, index));
+        WARNING_RESTORE
     }
 
     size_t pos = hash % map->alloc;

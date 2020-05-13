@@ -40,6 +40,10 @@
 // Flags for poll()
 #define FLAG_ONESHOT (1)
 
+// Result invalid
+#define TO_INVALID   ((mp_uint_t)-1)
+
+
 /// \module select - Provides select function to wait for events on a stream
 ///
 /// This module provides the select function.
@@ -121,7 +125,7 @@ STATIC mp_obj_t select_select(size_t n_args, const mp_obj_t *args) {
     mp_obj_get_array(args[2], &rwx_len[2], &x_array);
 
     // get timeout
-    mp_uint_t timeout = -1;
+    mp_uint_t timeout = TO_INVALID;
     if (n_args == 4) {
         if (args[3] != mp_const_none) {
             #if MICROPY_PY_BUILTINS_FLOAT
@@ -148,7 +152,7 @@ STATIC mp_obj_t select_select(size_t n_args, const mp_obj_t *args) {
         // poll the objects
         mp_uint_t n_ready = poll_map_poll(&poll_map, rwx_len);
 
-        if (n_ready > 0 || (timeout != -1 && mp_hal_ticks_ms() - start_tick >= timeout)) {
+        if (n_ready > 0 || (timeout != TO_INVALID && mp_hal_ticks_ms() - start_tick >= timeout)) {
             // one or more objects are ready, or we had a timeout
             mp_obj_t list_array[3];
             list_array[0] = mp_obj_new_list(rwx_len[0], NULL);
@@ -229,7 +233,7 @@ STATIC mp_uint_t poll_poll_internal(uint n_args, const mp_obj_t *args) {
     mp_obj_poll_t *self = MP_OBJ_TO_PTR(args[0]);
 
     // work out timeout (its given already in ms)
-    mp_uint_t timeout = -1;
+    mp_uint_t timeout = TO_INVALID;
     int flags = 0;
     if (n_args >= 2) {
         if (args[1] != mp_const_none) {
@@ -250,7 +254,7 @@ STATIC mp_uint_t poll_poll_internal(uint n_args, const mp_obj_t *args) {
     for (;;) {
         // poll the objects
         n_ready = poll_map_poll(&self->poll_map, NULL);
-        if (n_ready > 0 || (timeout != -1 && mp_hal_ticks_ms() - start_tick >= timeout)) {
+        if (n_ready > 0 || (timeout != TO_INVALID && mp_hal_ticks_ms() - start_tick >= timeout)) {
             break;
         }
         MICROPY_EVENT_POLL_HOOK

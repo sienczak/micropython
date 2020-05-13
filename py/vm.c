@@ -79,11 +79,15 @@
     } while ((*ip++ & 0x80) != 0)
 #define DECODE_PTR \
     ip = (byte*)MP_ALIGN(ip, sizeof(void*)); \
+    WARNING_DISABLE(cast_align) /* Required by design */ \
     void *ptr = *(void**)ip; \
+    WARNING_RESTORE \
     ip += sizeof(void*)
 #define DECODE_OBJ \
     ip = (byte*)MP_ALIGN(ip, sizeof(mp_obj_t)); \
+    WARNING_DISABLE(cast_align) /* Required by design */ \
     mp_obj_t obj = *(mp_obj_t*)ip; \
+    WARNING_RESTORE \
     ip += sizeof(mp_obj_t)
 
 #endif

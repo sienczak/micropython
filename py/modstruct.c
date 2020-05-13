@@ -77,7 +77,9 @@ STATIC mp_uint_t get_fmt_num(const char **p) {
     while (unichar_isdigit(*++num)) {
         len++;
     }
+    WARNING_DISABLE(bad_function_cast)
     mp_uint_t val = (mp_uint_t)MP_OBJ_SMALL_INT_VALUE(mp_parse_num_integer(*p, len, 10, NULL));
+    WARNING_RESTORE
     *p = num;
     return val;
 }
@@ -214,7 +216,9 @@ STATIC void struct_pack_into_internal(mp_obj_t fmt_in, byte *p, size_t n_args, c
 
 STATIC mp_obj_t struct_pack(size_t n_args, const mp_obj_t *args) {
     // TODO: "The arguments must match the values required by the format exactly."
+    WARNING_DISABLE(bad_function_cast)
     mp_int_t size = MP_OBJ_SMALL_INT_VALUE(struct_calcsize(args[0]));
+    WARNING_RESTORE
     vstr_t vstr;
     vstr_init_len(&vstr, size);
     byte *p = (byte *)vstr.buf;
@@ -240,7 +244,9 @@ STATIC mp_obj_t struct_pack_into(size_t n_args, const mp_obj_t *args) {
     p += offset;
 
     // Check that the output buffer is big enough to hold all the values
+    WARNING_DISABLE(bad_function_cast)
     mp_int_t sz = MP_OBJ_SMALL_INT_VALUE(struct_calcsize(args[0]));
+    WARNING_RESTORE
     if (p + sz > end_p) {
         mp_raise_ValueError(MP_ERROR_TEXT("buffer too small"));
     }

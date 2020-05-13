@@ -143,7 +143,9 @@ STATIC void mp_obj_class_lookup(struct class_lookup_data *lookup, const mp_obj_t
         // this should not be applied to class types, as will result in extra
         // lookup either.
         if (lookup->meth_offset != 0 && mp_obj_is_native_type(type)) {
+            WARNING_DISABLE(cast_align) // Required by design
             if (*(void **)((char *)type + lookup->meth_offset) != NULL) {
+                WARNING_RESTORE
                 DEBUG_printf("mp_obj_class_lookup: Matched special meth slot (off=%d) for %s\n",
                     lookup->meth_offset, qstr_str(lookup->attr));
                 lookup->dest[0] = MP_OBJ_SENTINEL;

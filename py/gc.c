@@ -870,7 +870,9 @@ void gc_dump_alloc_table(void) {
             */
             /* this prints the uPy object type of the head block */
             case AT_HEAD: {
+                WARNING_DISABLE(cast_align) // Required by design
                 void **ptr = (void **)(MP_STATE_MEM(gc_pool_start) + bl * BYTES_PER_BLOCK);
+                WARNING_RESTORE
                 if (*ptr == &mp_type_tuple) {
                     c = 'T';
                 } else if (*ptr == &mp_type_list) {

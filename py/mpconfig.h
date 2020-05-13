@@ -671,14 +671,18 @@ typedef long long mp_longint_impl_t;
 #endif
 
 #if MICROPY_FLOAT_IMPL == MICROPY_FLOAT_IMPL_FLOAT
+#include <float.h>
 #define MICROPY_PY_BUILTINS_FLOAT (1)
 #define MICROPY_FLOAT_CONST(x) x##F
 #define MICROPY_FLOAT_C_FUN(fun) fun##f
+#define MICROPY_FLOAT_EQ(float1, float2) ((((float)float1) < (((float)float2) + FLT_EPSILON)) && (((float)float1) > (((float)float2) - FLT_EPSILON)))
 typedef float mp_float_t;
+#include <float.h>
 #elif MICROPY_FLOAT_IMPL == MICROPY_FLOAT_IMPL_DOUBLE
 #define MICROPY_PY_BUILTINS_FLOAT (1)
 #define MICROPY_FLOAT_CONST(x) x
 #define MICROPY_FLOAT_C_FUN(fun) fun
+#define MICROPY_FLOAT_EQ(float1, float2) ((((double)float1) < (((double)float2) + DBL_EPSILON)) && (((double)float1) > (((double)float2) - DBL_EPSILON)))
 typedef double mp_float_t;
 #else
 #define MICROPY_PY_BUILTINS_FLOAT (0)
@@ -792,12 +796,12 @@ typedef double mp_float_t;
 #endif
 
 // Support for VFS POSIX component, to mount a POSIX filesystem within VFS
-#ifndef MICROPY_VFS
+#if !defined(MICROPY_VFS) || !defined(MICROPY_VFS_POSIX)
 #define MICROPY_VFS_POSIX (0)
 #endif
 
 // Support for VFS FAT component, to mount a FAT filesystem within VFS
-#ifndef MICROPY_VFS
+#if !defined(MICROPY_VFS) || !defined(MICROPY_VFS_FAT)
 #define MICROPY_VFS_FAT (0)
 #endif
 
@@ -1561,6 +1565,18 @@ typedef double mp_float_t;
 #define INT_FMT "%d"
 #endif
 #endif // INT_FMT
+
+// Suppress warnings in the case of need
+#ifndef WARNING_DISABLE
+#define WARNING_DISABLE(warn_type) _Pragma("GCC diagnostic push") _Pragma(WARNING_DISABLE_##warn_type)
+#define WARNING_DISABLE_cast_align        "GCC diagnostic ignored \"-Wcast-align\""
+#define WARNING_DISABLE_bad_function_cast "GCC diagnostic ignored \"-Wbad-function-cast\""
+#endif
+
+// Suppress warnings in the case of need
+#ifndef WARNING_RESTORE
+#define WARNING_RESTORE _Pragma("GCC diagnostic pop")
+#endif
 
 // Modifier for function which doesn't return
 #ifndef NORETURN

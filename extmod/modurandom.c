@@ -36,6 +36,10 @@
 // http://www.literatecode.com/yasmarang
 // Public Domain
 
+#if !defined(MICROPY_ENABLE_DYNRUNTIME)
+#   define   MICROPY_ENABLE_DYNRUNTIME 0
+#endif
+
 #if !MICROPY_ENABLE_DYNRUNTIME
 STATIC uint32_t yasmarang_pad = 0xeda4baba, yasmarang_n = 69, yasmarang_d = 233;
 STATIC uint8_t yasmarang_dat = 0;

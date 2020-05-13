@@ -605,7 +605,9 @@ STATIC mp_obj_t uctypes_struct_subscr(mp_obj_t self_in, mp_obj_t index_in, mp_ob
             }
 
         } else if (agg_type == PTR) {
+            WARNING_DISABLE(cast_align) // Required by design
             byte *p = *(void **)self->addr;
+            WARNING_RESTORE
             if (mp_obj_is_small_int(t->items[1])) {
                 uint val_type = GET_TYPE(MP_OBJ_SMALL_INT_VALUE(t->items[1]), VAL_TYPE_BITS);
                 return get_aligned(val_type, p, index);
@@ -635,15 +637,19 @@ STATIC mp_obj_t uctypes_struct_unary_op(mp_unary_op_t op, mp_obj_t self_in) {
                 mp_int_t offset = MP_OBJ_SMALL_INT_VALUE(t->items[0]);
                 uint agg_type = GET_TYPE(offset, AGG_TYPE_BITS);
                 if (agg_type == PTR) {
+                    WARNING_DISABLE(cast_align) // Required by design
                     byte *p = *(void **)self->addr;
+                    WARNING_RESTORE
                     return mp_obj_new_int((mp_int_t)(uintptr_t)p);
                 }
             }
-        /* fallthru */
+            break;
 
         default:
-            return MP_OBJ_NULL;      // op not supported
+            break;
     }
+    
+    return MP_OBJ_NULL;      // op not supported
 }
 
 STATIC mp_int_t uctypes_get_buffer(mp_obj_t self_in, mp_buffer_info_t *bufinfo, mp_uint_t flags) {

@@ -128,7 +128,9 @@ mp_obj_t mp_obj_tuple_unary_op(mp_unary_op_t op, mp_obj_t self_in) {
             // start hash with pointer to empty tuple, to make it fairly unique
             mp_int_t hash = (mp_int_t)mp_const_empty_tuple;
             for (size_t i = 0; i < self->len; i++) {
+                WARNING_DISABLE(bad_function_cast) // Required by design
                 hash += MP_OBJ_SMALL_INT_VALUE(mp_unary_op(MP_UNARY_OP_HASH, self->items[i]));
+                WARNING_RESTORE
             }
             return MP_OBJ_NEW_SMALL_INT(hash);
         }

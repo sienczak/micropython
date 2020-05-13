@@ -129,7 +129,9 @@ STATIC const mp_obj_type_t mp_type_thread_lock = {
 STATIC size_t thread_stack_size = 0;
 
 STATIC mp_obj_t mod_thread_get_ident(void) {
+    WARNING_DISABLE(bad_function_cast)
     return mp_obj_new_int_from_uint((uintptr_t)mp_thread_get_state());
+    WARNING_RESTORE
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(mod_thread_get_ident_obj, mod_thread_get_ident);
 

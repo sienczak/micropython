@@ -55,8 +55,8 @@
 #define RULE_ARG_RULE           (0x2000)
 #define RULE_ARG_OPT_RULE       (0x3000)
 
-// (un)comment to use rule names; for debugging
-// #define USE_RULE_NAME (1)
+// Set either 0 or 1 to use rule names; for debugging
+#define USE_RULE_NAME (0)
 
 // *FORMAT-OFF*
 
@@ -260,9 +260,11 @@ STATIC void *parser_alloc(parser_t *parser, size_t num_bytes) {
 
     if (chunk != NULL && chunk->union_.used + num_bytes > chunk->alloc) {
         // not enough room at end of previously allocated chunk so try to grow
+        WARNING_DISABLE(cast_align) // Required by design
         mp_parse_chunk_t *new_data = (mp_parse_chunk_t *)m_renew_maybe(byte, chunk,
             sizeof(mp_parse_chunk_t) + chunk->alloc,
             sizeof(mp_parse_chunk_t) + chunk->alloc + num_bytes, false);
+        WARNING_RESTORE
         if (new_data == NULL) {
             // could not grow existing memory; shrink it to fit previous
             (void)m_renew_maybe(byte, chunk, sizeof(mp_parse_chunk_t) + chunk->alloc,
@@ -283,7 +285,9 @@ STATIC void *parser_alloc(parser_t *parser, size_t num_bytes) {
         if (alloc < num_bytes) {
             alloc = num_bytes;
         }
+        WARNING_DISABLE(cast_align) // Required by design
         chunk = (mp_parse_chunk_t *)m_new(byte, sizeof(mp_parse_chunk_t) + alloc);
+        WARNING_RESTORE
         chunk->alloc = alloc;
         chunk->union_.used = 0;
         parser->cur_chunk = chunk;
