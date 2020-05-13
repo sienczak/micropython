@@ -51,7 +51,9 @@ typedef struct _mp_obj_decompio_t {
 STATIC int read_src_stream(TINF_DATA *data) {
     byte *p = (void *)data;
     p -= offsetof(mp_obj_decompio_t, decomp);
+    WARNING_DISABLE(cast_align) // Required by design
     mp_obj_decompio_t *self = (mp_obj_decompio_t *)p;
+    WARNING_RESTORE
 
     const mp_stream_p_t *stream = mp_get_stream(self->src_stream);
     int err;
