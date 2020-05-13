@@ -428,9 +428,15 @@ int mp_vprintf(const mp_print_t *print, const char *fmt, va_list args) {
         }
 
         // parse width, if it exists
-        int width = 0;
-        for (; '0' <= *fmt && *fmt <= '9'; ++fmt) {
-            width = width * 10 + *fmt - '0';
+        int width;
+        if (*fmt == '*') {
+            ++fmt;
+            width = va_arg(args, int);
+        } else {
+            width = 0;
+            for (; '0' <= *fmt && *fmt <= '9'; ++fmt) {
+                width = width * 10 + *fmt - '0';
+            }
         }
 
         // parse precision, if it exists
@@ -505,6 +511,7 @@ int mp_vprintf(const mp_print_t *print, const char *fmt, va_list args) {
                 chrs += mp_print_strn(print, str, prec, flags, fill, width);
                 break;
             }
+            case 'i':
             case 'd': {
                 mp_int_t val;
                 if (long_arg) {
